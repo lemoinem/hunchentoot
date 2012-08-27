@@ -375,11 +375,13 @@ is set up via PROCESS-REQUEST."
                                       :method nil
                                       :uri nil
                                       :server-protocol nil))))
-               (with-character-stream-semantics
-                 (send-response acceptor
-                                (flex:make-flexi-stream *hunchentoot-stream* :external-format :iso-8859-1)
-                                +http-service-unavailable+
-                                :content (acceptor-status-message acceptor +http-service-unavailable+))))))
+               (get-request-data *hunchentoot-stream*)
+               (let ((*header-stream* (progn nil (acceptor-message-log-destination acceptor))))
+                 (with-character-stream-semantics
+                   (send-response acceptor
+                                  (flex:make-flexi-stream *hunchentoot-stream* :external-format :iso-8859-1)
+                                  +http-service-unavailable+
+                                  :content (acceptor-status-message acceptor +http-service-unavailable+)))))))
       (decrement-taskmaster-accept-count taskmaster)
       (when *hunchentoot-stream*
         (ignore-errors*
